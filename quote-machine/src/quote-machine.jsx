@@ -282,7 +282,7 @@ const QuoteMachine = () => {
       </div>
 
       <div style={styles.footer}>
-        by <strong>v0</strong>
+        by <strong>maxwell</strong>
       </div>
     </div>
   )
