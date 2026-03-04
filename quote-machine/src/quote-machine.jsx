@@ -48,7 +48,7 @@ const quotes = [
     author: "Vernon Law",
   },
   {
-    text: "To live is the rarest thing in the world. Most people just exist.",
+    text: "To live is the rarest thing in the world. Most people exist, that is all.",
     author: "Oscar Wilde",
   },
   {
@@ -63,19 +63,117 @@ const quotes = [
     text: "Go confidently in the direction of your dreams. Live the life you have imagined.",
     author: "Henry David Thoreau",
   },
+  {
+    text: "In the end, it is not the years in your life that count. It's the life in your years.",
+    author: "Abraham Lincoln",
+  },
+  {
+    text: "The unexamined life is not worth living.",
+    author: "Socrates",
+  },
+  {
+    text: "Get busy living or get busy dying.",
+    author: "Stephen King",
+  },
+  {
+    text: "Time moves slowly, but passes quickly.",
+    author: "Alice Walker",
+  },
+  {
+    text: "There are years that ask questions and years that answer.",
+    author: "Zora Neale Hurston",
+  },
+  {
+    text: "Life, although it may only be an accumulation of anguish, is dear to me and I will defend it.",
+    author: "Mary Shelley",
+  },
+  {
+    text: "What do we live for, if it is not to make life less difficult to each other?",
+    author: "George Eliot",
+  },
+  {
+    text: "Everyone seems to have a clear idea of how other people should lead their lives, but none about his or her own.",
+    author: "Paulo Coelho",
+  },
+  {
+    text: "There is no greater agony than bearing an untold story inside you.",
+    author: "Maya Angelou",
+  },
+  {
+    text: "Isn't it nice to think that tomorrow is a new day with no mistakes in it yet?",
+    author: "Lucy Maud Montgomery",
+  },
+  {
+    text: "Anything worth dying for is certainly worth living for.",
+    author: "Joseph Heller",
+  },
+  {
+    text: "I took a deep breath and listened to the old brag of my heart: I am, I am, I am.",
+    author: "Sylvia Plath",
+  },
+  {
+    text: "It is the possibility of having a dream come true that makes life interesting.",
+    author: "Paulo Coelho",
+  },
+  {
+    text: "I can't stand it to think my life is going so fast and I'm not really living it.",
+    author: "Ernest Hemingway",
+  },
+  {
+    text: "This is your life and it's ending one minute at a time.",
+    author: "Chuck Palahniuk",
+  },
+  {
+    text: "I have a dream.",
+    author: "Martin Luther King Jr.",
+  },
+  {
+    text: "The greatest glory in living lies not in never falling, but in rising every time we fall.",
+    author: "Nelson Mandela",
+  },
+  {
+    text: "The best way to find out if you can trust somebody is to trust them.",
+    author: "Ernest Hemingway",
+  },
+  {
+    text: "The only limit to our realization of tomorrow will be our doubts of today.",
+    author: "Franklin D. Roosevelt",
+  },
+  {
+    text: "The only thing that feels better than winning is winning when nobody thought you could.",
+    author: "Hank Aaron",
+  },
+  {
+    text: "The most important thing is to enjoy your life — to be happy — it's all that matters.",
+    author: "Audrey Hepburn",
+  },
+  {
+    text: "You can have anything you want if you are willing to give up everything you have.",
+    author: "Oprah Winfrey",
+  },
+  {
+    text: "In order to be truly happy, you must pursue your dreams and goals.",
+    author: "Oprah Winfrey",
+  },
+  {
+    text: "If you want something you've never had, you must be willing to do something you've never done.",
+    author: "Unknown",
+  },
 ]
 
 const colors = [
-  "#FF6B6B",
-  "#4ECDC4",
-  "#45B7D1",
-  "#96CEB4",
-  "#FFEAA7",
-  "#DDA0DD",
-  "#98D8C8",
-  "#F7DC6F",
-  "#BB8FCE",
-  "#85C1E9",
+  // Deep teal
+  "#0F766E",
+  // Indigo
+  "#3730A3",
+  // Royal blue
+  "#1D4ED8",
+  // Emerald
+  "#059669",
+  // Amber
+  "#D97706",
+  // Slate
+  "#334155",
 ]
 
 const QuoteMachine = () => {
@@ -139,15 +237,15 @@ const QuoteMachine = () => {
       alignItems: "center",
       justifyContent: "center",
       padding: "20px",
-      backgroundColor: currentColor,
-      transition: "background-color 0.5s ease",
-      fontFamily: "Arial, sans-serif",
+      background: "linear-gradient(135deg, #020617 0%, #0f172a 40%, #111827 100%)",
+      transition: "background 0.6s ease",
+      fontFamily: '"Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     },
     quoteBox: {
       backgroundColor: "white",
-      borderRadius: "10px",
-      boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
-      padding: "40px",
+      borderRadius: "16px",
+      boxShadow: "0 24px 60px rgba(15,23,42,0.65)",
+      padding: "32px 32px 28px",
       maxWidth: "600px",
       width: "100%",
       textAlign: "center",
@@ -155,19 +253,21 @@ const QuoteMachine = () => {
       transition: "all 0.5s ease",
     },
     text: {
-      fontSize: "28px",
-      fontFamily: "Georgia, serif",
-      marginBottom: "20px",
+      fontSize: "clamp(1.6rem, 2vw + 0.5rem, 2rem)",
+      fontWeight: 500,
+      marginBottom: "16px",
       color: currentColor,
       opacity: isLoading ? 0.5 : 1,
       transition: "all 0.5s ease",
       lineHeight: "1.4",
     },
     author: {
-      fontSize: "18px",
+      fontSize: "0.95rem",
       fontWeight: "bold",
-      marginBottom: "30px",
-      color: currentColor,
+      textTransform: "uppercase",
+      letterSpacing: "0.12em",
+      marginBottom: "26px",
+      color: "#4b5563",
       opacity: isLoading ? 0.5 : 1,
       transition: "all 0.5s ease",
     },
@@ -182,11 +282,11 @@ const QuoteMachine = () => {
       backgroundColor: currentColor,
       color: "white",
       border: "none",
-      padding: "12px 20px",
-      borderRadius: "5px",
+      padding: "10px 20px",
+      borderRadius: "999px",
       cursor: isLoading ? "not-allowed" : "pointer",
-      fontSize: "16px",
-      fontWeight: "bold",
+      fontSize: "0.95rem",
+      fontWeight: 600,
       textDecoration: "none",
       display: "inline-flex",
       alignItems: "center",
@@ -194,16 +294,17 @@ const QuoteMachine = () => {
       transition: "all 0.3s ease",
       opacity: isLoading ? 0.7 : 1,
       transform: "scale(1)",
+      boxShadow: "0 14px 30px rgba(15,23,42,0.35)",
     },
     tweetButton: {
-      backgroundColor: currentColor,
-      color: "white",
-      border: "none",
-      padding: "12px 20px",
-      borderRadius: "5px",
+      backgroundColor: "transparent",
+      color: currentColor,
+      border: `1px solid ${currentColor}`,
+      padding: "10px 18px",
+      borderRadius: "999px",
       cursor: "pointer",
-      fontSize: "16px",
-      fontWeight: "bold",
+      fontSize: "0.9rem",
+      fontWeight: 500,
       textDecoration: "none",
       display: "inline-flex",
       alignItems: "center",
@@ -219,7 +320,7 @@ const QuoteMachine = () => {
       bottom: "20px",
       right: "20px",
       color: "white",
-      fontSize: "14px",
+      fontSize: "12px",
       opacity: 0.7,
     },
   }
