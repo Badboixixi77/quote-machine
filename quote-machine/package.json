@@ -2,6 +2,13 @@
   "name": "quote-machine",
   "version": "0.1.0",
   "private": true,
+  "description": "A polished random quote generator with dynamic accent colors and Tweet integration.",
+  "author": "Badboixixi77",
+  "homepage": "https://quote-machine-neon.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Badboixixi77/quote-machine.git"
+  },
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -16,6 +23,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:ci": "CI=true react-scripts test --watchAll=false",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
