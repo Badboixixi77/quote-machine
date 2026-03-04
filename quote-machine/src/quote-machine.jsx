@@ -158,9 +158,7 @@ const QuoteMachine = () => {
         </div>
       </div>
 
-      <div className="quote-app__footer">
-        by <strong>maxwell</strong>
-      </div>
+      <div className="quote-app__footer" />
     </div>
   )
 }

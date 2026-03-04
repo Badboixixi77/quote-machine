@@ -91,7 +91,16 @@
 
 @media (max-width: 480px) {
   .quote-app__box {
-    padding: 24px 20px 22px;
+    padding: 20px 16px 18px;
+  }
+
+  .quote-app__text {
+    font-size: 1.25rem;
+  }
+
+  .quote-app__author {
+    font-size: 0.8rem;
+    margin-bottom: 20px;
   }
 
   .quote-app__buttons {
@@ -103,6 +112,10 @@
   .quote-app__button--secondary {
     justify-content: center;
     width: 100%;
+  }
+
+  .quote-app__footer {
+    display: none;
   }
 }
 
