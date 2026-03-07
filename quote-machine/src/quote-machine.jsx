@@ -1,9 +1,8 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { quotes } from "./quotes"
-import { colors } from "./theme"
 import "./QuoteMachine.css"
+
+const colors = ["#22C55E", "#EC4899", "#F97316", "#6366F1", "#06B6D4", "#FACC15"]
 
 const QuoteMachine = () => {
   const [currentQuote, setCurrentQuote] = useState(quotes[0])
@@ -36,6 +35,32 @@ const QuoteMachine = () => {
   const getTweetUrl = () => {
     const tweetText = `"${currentQuote.text}" - ${currentQuote.author}`
     return `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`
+  }
+
+  const handleShare = async () => {
+    const shareText = `"${currentQuote.text}" - ${currentQuote.author}`
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          text: shareText,
+          url: window.location.href,
+        })
+      } catch (err) {
+        // User cancelled or share failed
+        if (err.name !== 'AbortError') {
+          console.error('Error sharing:', err)
+        }
+      }
+    } else {
+      // Fallback: copy to clipboard
+      try {
+        await navigator.clipboard.writeText(shareText)
+        alert('Quote copied to clipboard!')
+      } catch (err) {
+        console.error('Failed to copy:', err)
+      }
+    }
   }
 
   // Set initial random quote on component mount
@@ -78,9 +103,9 @@ const QuoteMachine = () => {
             opacity: isLoading ? 0.5 : 1,
           }}
         >
-          <span style={{ fontSize: "40px" }}>"</span>
+          <span className="quote-app__quote-mark">"</span>
           {currentQuote.text}
-          <span style={{ fontSize: "40px" }}>"</span>
+          <span className="quote-app__quote-mark">"</span>
         </div>
 
         <div
@@ -94,7 +119,8 @@ const QuoteMachine = () => {
           - {currentQuote.author}
         </div>
 
-        <div className="quote-app__buttons">
+      <div className="quote-app__buttons">
+        <div className="quote-app__social-buttons">
           <a
             id="tweet-quote"
             href={getTweetUrl()}
@@ -120,45 +146,69 @@ const QuoteMachine = () => {
           </a>
 
           <button
-            id="new-quote"
-            onClick={getRandomQuote}
-            disabled={isLoading}
-            className="quote-app__button"
+            onClick={handleShare}
+            className="quote-app__button--secondary"
             style={{
-              backgroundColor: currentColor,
-              opacity: isLoading ? 0.7 : 1,
-              cursor: isLoading ? "not-allowed" : "pointer",
+              color: currentColor,
+              borderColor: currentColor,
             }}
+            aria-label="Share this quote"
             onMouseEnter={(event) => {
-              if (!isLoading) {
-                event.currentTarget.style.transform = "scale(1.05)"
-              }
+              event.currentTarget.style.transform = "scale(1.05)"
             }}
             onMouseLeave={(event) => {
               event.currentTarget.style.transform = "scale(1)"
             }}
           >
-            <svg
-              className="quote-app__icon"
-              style={{
-                transform: isLoading ? "rotate(360deg)" : "rotate(0deg)",
-                transition: "transform 0.5s ease",
-              }}
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <polyline points="23 4 23 10 17 10"></polyline>
-              <polyline points="1 20 1 14 7 14"></polyline>
-              <path d="m3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            <svg className="quote-app__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
             </svg>
-            {isLoading ? "Loading..." : "New Quote"}
+            Share
           </button>
         </div>
-      </div>
 
-      <div className="quote-app__footer" />
+        <button
+          id="new-quote"
+          onClick={getRandomQuote}
+          disabled={isLoading}
+          className="quote-app__button"
+          style={{
+            backgroundColor: currentColor,
+            opacity: isLoading ? 0.7 : 1,
+            cursor: isLoading ? "not-allowed" : "pointer",
+          }}
+          onMouseEnter={(event) => {
+            if (!isLoading) {
+              event.currentTarget.style.transform = "scale(1.05)"
+            }
+          }}
+          onMouseLeave={(event) => {
+            event.currentTarget.style.transform = "scale(1)"
+          }}
+        >
+          <svg
+            className="quote-app__icon"
+            style={{
+              transform: isLoading ? "rotate(360deg)" : "rotate(0deg)",
+              transition: "transform 0.5s ease",
+            }}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="m3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          {isLoading ? "Loading..." : "New Quote"}
+        </button>
+      </div>
+      </div>
     </div>
   )
 }

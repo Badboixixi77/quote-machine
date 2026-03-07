@@ -28,6 +28,11 @@
   line-height: 1.4;
 }
 
+.quote-app__quote-mark {
+  font-size: 2.5rem;
+  line-height: 0;
+}
+
 .quote-app__author {
   font-size: 0.95rem;
   font-weight: 700;
@@ -42,7 +47,13 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+  gap: 12px;
+}
+
+.quote-app__social-buttons {
+  display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .quote-app__button,
@@ -67,6 +78,7 @@
 
 .quote-app__button--secondary {
   background: transparent;
+  border: 2px solid;
 }
 
 .quote-app__button:focus-visible,
@@ -78,15 +90,6 @@
 .quote-app__icon {
   width: 16px;
   height: 16px;
-}
-
-.quote-app__footer {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  color: #ffffff;
-  font-size: 12px;
-  opacity: 0.7;
 }
 
 @media (max-width: 480px) {
@@ -104,18 +107,24 @@
   }
 
   .quote-app__buttons {
-    flex-direction: column-reverse;
+    flex-direction: column;
     align-items: stretch;
+    gap: 12px;
   }
 
-  .quote-app__button,
+  .quote-app__social-buttons {
+    display: flex;
+    gap: 10px;
+    order: 2;
+  }
+
+  .quote-app__button {
+    order: 1;
+  }
+
   .quote-app__button--secondary {
     justify-content: center;
-    width: 100%;
-  }
-
-  .quote-app__footer {
-    display: none;
+    flex: 1;
   }
 }
 
