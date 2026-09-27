@@ -1,24 +1,7 @@
-// Quote API service using multiple free APIs for reliability
-// Primary: quotable.io, Fallback: quote-garden
+// Multi-API Quote Service - Maximum quote variety
+// Tries multiple free APIs for endless unique quotes
 
-const APIs = {
-  quotable: {
-    url: 'https://api.quotable.io/random',
-    parse: (data) => ({
-      text: data.content,
-      author: data.author,
-      tags: data.tags || [],
-    }),
-  },
-  quotecatalog: {
-    url: 'https://api.quotecatalog.com/quotes/random',
-    parse: (data) => ({
-      text: data.quote?.text || data.text,
-      author: data.quote?.author || data.author,
-      tags: [],
-    }),
-  },
-}
+const API_TIMEOUT = 5000 // 5 seconds
 
 // Map our categories to quotable tags
 const categoryToTag = {
@@ -30,18 +13,16 @@ const categoryToTag = {
   Humor: 'humor|funny',
 }
 
-export async function fetchRandomQuote(category = 'All') {
-  // Try quotable.io first
+// API 1: Quotable.io (when it works)
+async function fetchFromQuotable(category = 'All') {
   try {
-    let url = APIs.quotable.url
+    let url = 'https://api.quotable.io/random'
     
     if (category !== 'All' && categoryToTag[category]) {
       url += `?tags=${categoryToTag[category]}`
     }
 
-    const response = await fetch(url, { 
-      signal: AbortSignal.timeout(5000) // 5 second timeout
-    })
+    const response = await fetch(url, { signal: AbortSignal.timeout(API_TIMEOUT) })
     
     if (response.ok) {
       const data = await response.json()
@@ -50,18 +31,20 @@ export async function fetchRandomQuote(category = 'All') {
           text: data.content,
           author: data.author,
           category: category === 'All' ? detectCategory(data.tags) : category,
-          source: 'quotable',
         }
       }
     }
   } catch (error) {
-    console.warn('Quotable API failed, trying fallback...', error.message)
+    console.warn('Quotable API failed:', error.message)
   }
+  return null
+}
 
-  // Fallback: Use a different approach - fetch from a CORS-friendly API
+// API 2: Type.fit (1600+ quotes, very reliable)
+async function fetchFromTypeFit(category = 'All') {
   try {
     const response = await fetch('https://type.fit/api/quotes', {
-      signal: AbortSignal.timeout(5000)
+      signal: AbortSignal.timeout(API_TIMEOUT)
     })
     
     if (response.ok) {
@@ -73,14 +56,80 @@ export async function fetchRandomQuote(category = 'All') {
         text: quote.text?.trim() || '',
         author: quote.author?.trim() || 'Unknown',
         category: category === 'All' ? 'Life' : category,
-        source: 'typefit',
       }
     }
   } catch (error) {
-    console.warn('Type.fit API also failed:', error.message)
+    console.warn('Type.fit API failed:', error.message)
+  }
+  return null
+}
+
+// API 3: Quote Garden (large database)
+async function fetchFromQuoteGarden(category = 'All') {
+  try {
+    const response = await fetch('https://quote-garden.onrender.com/api/v3/quotes/random', {
+      signal: AbortSignal.timeout(API_TIMEOUT)
+    })
+    
+    if (response.ok) {
+      const data = await response.json()
+      if (data && data.data && data.data[0]) {
+        const quote = data.data[0]
+        return {
+          text: quote.quoteText?.trim() || '',
+          author: quote.quoteAuthor?.trim() || 'Unknown',
+          category: category === 'All' ? 'Life' : category,
+        }
+      }
+    }
+  } catch (error) {
+    console.warn('Quote Garden API failed:', error.message)
+  }
+  return null
+}
+
+// API 4: Forismatic (motivational quotes)
+async function fetchFromForismatic(category = 'All') {
+  try {
+    const response = await fetch('https://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en', {
+      signal: AbortSignal.timeout(API_TIMEOUT)
+    })
+    
+    if (response.ok) {
+      const data = await response.json()
+      if (data && data.quoteText) {
+        return {
+          text: data.quoteText?.trim() || '',
+          author: data.quoteAuthor?.trim() || 'Unknown',
+          category: category === 'All' ? 'Motivational' : category,
+        }
+      }
+    }
+  } catch (error) {
+    console.warn('Forismatic API failed:', error.message)
+  }
+  return null
+}
+
+// Main function - tries multiple APIs in order
+export async function fetchRandomQuote(category = 'All') {
+  // Try APIs in order of reliability
+  const apis = [
+    fetchFromTypeFit,      // Most reliable
+    fetchFromQuoteGarden,  // Large database
+    fetchFromForismatic,   // Motivational focus
+    fetchFromQuotable,     // When it works
+  ]
+
+  for (const api of apis) {
+    const quote = await api(category)
+    if (quote && quote.text && quote.text.length > 10) {
+      return quote
+    }
   }
 
   // All APIs failed
+  console.error('All quote APIs failed')
   return null
 }
 
