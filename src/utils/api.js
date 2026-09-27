@@ -1,7 +1,24 @@
-// Quote API service using quotable.io (free, no auth required)
-// Docs: https://github.com/lukePeavey/quotable
+// Quote API service using multiple free APIs for reliability
+// Primary: quotable.io, Fallback: quote-garden
 
-const API_BASE = 'https://api.quotable.io'
+const APIs = {
+  quotable: {
+    url: 'https://api.quotable.io/random',
+    parse: (data) => ({
+      text: data.content,
+      author: data.author,
+      tags: data.tags || [],
+    }),
+  },
+  quotecatalog: {
+    url: 'https://api.quotecatalog.com/quotes/random',
+    parse: (data) => ({
+      text: data.quote?.text || data.text,
+      author: data.quote?.author || data.author,
+      tags: [],
+    }),
+  },
+}
 
 // Map our categories to quotable tags
 const categoryToTag = {
@@ -14,59 +31,57 @@ const categoryToTag = {
 }
 
 export async function fetchRandomQuote(category = 'All') {
+  // Try quotable.io first
   try {
-    let url = `${API_BASE}/random`
+    let url = APIs.quotable.url
     
-    // Add tag filter if category is specified
     if (category !== 'All' && categoryToTag[category]) {
       url += `?tags=${categoryToTag[category]}`
     }
 
-    const response = await fetch(url)
+    const response = await fetch(url, { 
+      signal: AbortSignal.timeout(5000) // 5 second timeout
+    })
     
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`)
-    }
-
-    const data = await response.json()
-    
-    // Transform to our format
-    return {
-      text: data.content,
-      author: data.author,
-      category: category === 'All' ? detectCategory(data.tags) : category,
+    if (response.ok) {
+      const data = await response.json()
+      if (data && data.content) {
+        return {
+          text: data.content,
+          author: data.author,
+          category: category === 'All' ? detectCategory(data.tags) : category,
+          source: 'quotable',
+        }
+      }
     }
   } catch (error) {
-    console.error('Failed to fetch quote from API:', error)
-    return null
+    console.warn('Quotable API failed, trying fallback...', error.message)
   }
-}
 
-export async function fetchMultipleQuotes(count = 10, category = 'All') {
+  // Fallback: Use a different approach - fetch from a CORS-friendly API
   try {
-    let url = `${API_BASE}/quotes/random?limit=${count}`
+    const response = await fetch('https://type.fit/api/quotes', {
+      signal: AbortSignal.timeout(5000)
+    })
     
-    if (category !== 'All' && categoryToTag[category]) {
-      url += `&tags=${categoryToTag[category]}`
+    if (response.ok) {
+      const data = await response.json()
+      const randomIndex = Math.floor(Math.random() * data.length)
+      const quote = data[randomIndex]
+      
+      return {
+        text: quote.text?.trim() || '',
+        author: quote.author?.trim() || 'Unknown',
+        category: category === 'All' ? 'Life' : category,
+        source: 'typefit',
+      }
     }
-
-    const response = await fetch(url)
-    
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`)
-    }
-
-    const data = await response.json()
-    
-    return data.map(quote => ({
-      text: quote.content,
-      author: quote.author,
-      category: category === 'All' ? detectCategory(quote.tags) : category,
-    }))
   } catch (error) {
-    console.error('Failed to fetch quotes from API:', error)
-    return []
+    console.warn('Type.fit API also failed:', error.message)
   }
+
+  // All APIs failed
+  return null
 }
 
 // Helper to map API tags to our categories
@@ -77,5 +92,5 @@ function detectCategory(tags = []) {
   if (tags.some(t => ['wisdom', 'knowledge', 'learning'].includes(t))) return 'Wisdom'
   if (tags.some(t => ['love', 'friendship'].includes(t))) return 'Love'
   if (tags.some(t => ['humor', 'funny'].includes(t))) return 'Humor'
-  return 'Life' // default
+  return 'Life'
 }
